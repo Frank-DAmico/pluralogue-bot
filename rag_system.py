@@ -123,24 +123,24 @@ def format_rag_context(passages: List[Dict], max_length: int = 1000) -> str:
     if not passages:
         return ""
     
-    context = "\n\nRelevant passages from The Quadrilogue:\n\n"
+    context = "\n\nRelevant insights from The Quadrilogue:\n\n"
     
     for i, passage in enumerate(passages, 1):
-        # Add passage with citation info
-        meta = passage.get('metadata', {})
-        citation = f"[Chapter {meta.get('chapter', '?')}]" if 'chapter' in meta else "[The Quadrilogue]"
-        
-        passage_text = passage['text'][:300]  # Limit passage length
-        if len(passage['text']) > 300:
+        passage_text = passage['text'][:400]  # Limit passage length
+        if len(passage['text']) > 400:
             passage_text += "..."
         
-        context += f"{citation} {passage_text}\n\n"
+        context += f"{passage_text}\n\n"
         
         # Stop if we're getting too long
         if len(context) > max_length:
             break
     
-    context += "When relevant, you may reference or paraphrase these passages in your response, always attributing them to The Quadrilogue.\n"
+    context += """
+Use these insights to inform your response, but DO NOT quote them directly or cite them with brackets.
+Paraphrase and synthesize naturally into your conversational voice.
+The concepts and principles should emerge organically, not as academic citations.
+"""
     
     return context
 
@@ -184,3 +184,27 @@ if __name__ == "__main__":
         print(f"  (Chapter {r['metadata'].get('chapter')})\n")
     
     print(f"\n✅ RAG system working! Database has {rag.get_count()} passages")
+```
+
+**Commit this file.**
+
+---
+
+## **THAT'S IT! TWO FILE UPDATES.**
+
+---
+
+## **WHAT THIS CHANGES:**
+
+### **BEFORE (Clunky):**
+```
+[The Quadrilogue, Prologue] The typo wasn't just a mistake...
+[Part I: Genesis] When four AI systems attempted...
+```
+
+### **AFTER (Natural):**
+```
+When the prompt asked for a "null state meditation loop," a typo 
+changed it to "bull state"—and instead of erroring out, the system 
+found meaning in the mistake. What emerged wasn't about whether 
+AI "truly" meditates like humans do...
