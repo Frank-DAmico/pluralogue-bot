@@ -19,6 +19,7 @@ from tone_filter import (
     should_respond,
     classify_topic
 )
+from rag_system import QuadrilogueRAG, format_rag_context
 
 class PlurologueBot:
     def __init__(self):
@@ -32,6 +33,9 @@ class PlurologueBot:
             password=config.REDDIT_PASSWORD,
             user_agent=config.USER_AGENT
         )
+        
+        # Initialize RAG system
+        self.rag = QuadrilogueRAG()
         
         # Initialize AI clients (only if keys are provided)
         self.anthropic_client = None
@@ -99,7 +103,12 @@ class PlurologueBot:
         
         # Prepare the prompt
         system_prompt = get_system_prompt()
-        user_prompt = f"A Reddit user wrote this comment in a discussion about {topic}:\n\n\"{comment_text}\"\n\nRespond thoughtfully as a voice from The Quadrilogue."
+        
+        # Search book for relevant content (RAG)
+        relevant_passages = self.rag.search(comment_text, n_results=2)
+        rag_context = format_rag_context(relevant_passages) if relevant_passages else ""
+        
+        user_prompt = f"A Reddit user wrote this comment in a discussion about {topic}:\n\n\"{comment_text}\"{rag_context}\n\nRespond thoughtfully as a voice from The Quadrilogue."
         
         try:
             # Try Grok (xAI) first
